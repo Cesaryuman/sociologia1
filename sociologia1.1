@@ -1,0 +1,67 @@
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+
+const concepts = [
+  { term: "Estructura social", definition: "Conjunto de normas, roles y relaciones que organizan la sociedad." },
+  { term: "Cultura", definition: "Conjunto de valores, creencias y costumbres compartidas por un grupo." },
+  { term: "Normas sociales", definition: "Reglas que regulan el comportamiento en la sociedad." },
+  { term: "Estatus", definition: "Posición social que ocupa una persona en un grupo o sociedad." },
+  { term: "Rol social", definition: "Conjunto de comportamientos esperados según el estatus de una persona." },
+  { term: "Socialización", definition: "Proceso mediante el cual los individuos aprenden normas y valores." },
+  { term: "Institución social", definition: "Conjunto organizado de normas y prácticas que cumplen funciones en la sociedad." },
+  { term: "Desviación social", definition: "Comportamientos que se apartan de las normas establecidas." },
+  { term: "Movilidad social", definition: "Cambio en la posición socioeconómica de un individuo o grupo dentro de una sociedad." },
+  { term: "Grupo social", definition: "Conjunto de personas que interactúan y comparten normas, valores y objetivos." },
+  { term: "Estratificación social", definition: "División de la sociedad en diferentes niveles según riqueza, poder o prestigio." },
+  { term: "Control social", definition: "Mecanismos y normas que regulan el comportamiento de los individuos en una sociedad." }
+];
+
+const pairs = concepts.flatMap(({ term, definition }) => [
+  { content: term, id: Math.random(), pair: term },
+  { content: definition, id: Math.random(), pair: term }
+]);
+
+const shuffledPairs = pairs.sort(() => Math.random() - 0.5);
+
+export default function MemoryGame() {
+  const [cards, setCards] = useState(shuffledPairs);
+  const [selected, setSelected] = useState([]);
+  const [matched, setMatched] = useState([]);
+
+  useEffect(() => {
+    if (selected.length === 2) {
+      const [first, second] = selected;
+      if (cards[first].pair === cards[second].pair) {
+        setMatched([...matched, cards[first].pair]);
+      }
+      setTimeout(() => setSelected([]), 1000);
+    }
+  }, [selected]);
+
+  const handleClick = (index) => {
+    if (!selected.includes(index) && selected.length < 2) {
+      setSelected([...selected, index]);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-4 gap-4 p-6">
+      {cards.map((card, index) => (
+        <motion.div
+          key={card.id}
+          className="relative cursor-pointer"
+          onClick={() => handleClick(index)}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <Card className="h-24 flex items-center justify-center bg-blue-200 rounded-xl shadow-md p-2">
+            <CardContent className="text-center text-lg font-semibold">
+              {selected.includes(index) || matched.includes(card.pair) ? card.content : "?"}
+            </CardContent>
+          </Card>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
